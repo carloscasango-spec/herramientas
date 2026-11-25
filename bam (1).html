@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Módulo BAM · Gestor Operativo · Grupo Synergo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #070b14;
+      --bg-gradient: radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.16), transparent 42%),
+                     radial-gradient(circle at 88% 8%, rgba(16, 185, 129, 0.11), transparent 38%),
+                     #070b14;
+      --surface: rgba(15, 23, 42, 0.88);
+      --surface-elevated: #131d33;
+      --surface-input: #0c1322;
+      --border: rgba(148, 163, 184, 0.16);
+      --border-strong: rgba(148, 163, 184, 0.28);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --accent-ring: rgba(59, 130, 246, 0.35);
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.15);
+      --success-text: #6ee7b7;
+      --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.15);
+      --warning-text: #fcd34d;
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.15);
+      --danger-text: #fca5a5;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 20px 14px 48px;
+    }
+
+    .app-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .header-card {
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb 0%, #10b981 100%);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: var(--success-text);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      margin-top: 7px;
+    }
+
+    .status-pill.warn {
+      background: var(--warning-soft);
+      color: var(--warning-text);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 700px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-card);
+    }
+
+    .kpi-label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-tag {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #93c5fd;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 18px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #93c5fd;
+      font-size: 0.8rem;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .field {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      background: var(--surface-input);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      font-family: inherit;
+      font-size: 0.94rem;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-ring);
+    }
+
+    .field-note {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .autocomplete-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      right: 0;
+      background: #0b1220;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-md);
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 50;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.65);
+      display: none;
+    }
+
+    .autocomplete-option {
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      font-size: 0.88rem;
+    }
+
+    .autocomplete-option:hover,
+    .autocomplete-option.active {
+      background: var(--accent-soft);
+    }
+
+    .code-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 0.84rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .chip-es {
+      background: var(--accent-soft);
+      color: #93c5fd;
+    }
+
+    .chip-gc {
+      background: var(--success-soft);
+      color: var(--success-text);
+    }
+
+    .toggle-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      padding: 13px 14px;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .toggle-card input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .relation-banner {
+      background: rgba(59, 130, 246, 0.09);
+      border: 1px solid rgba(59, 130, 246, 0.32);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 15px;
+      font-size: 0.86rem;
+    }
+
+    .relation-banner.muted-state {
+      background: var(--surface-elevated);
+      border-color: var(--border);
+      opacity: 0.85;
+    }
+
+    .preview-box {
+      background: #080d18;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      user-select: all;
+      word-break: break-word;
+    }
+
+    .preview-subject {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .preview-body {
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+
+    .notice-banner {
+      background: var(--warning-soft);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--warning-text);
+      padding: 10px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 0.81rem;
+      margin-top: 9px;
+      display: none;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 15px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.87rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #042017;
+    }
+
+    .btn-ghost {
+      background: var(--surface-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .btn-warn {
+      background: var(--warning-soft);
+      color: var(--warning-text);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-danger {
+      background: var(--danger-soft);
+      color: var(--danger-text);
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-xs {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      border-radius: 7px;
+    }
+
+    .active-card {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      margin-bottom: 10px;
+    }
+
+    .active-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .active-card-title {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .active-card-sub {
+      font-size: 0.77rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 14px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .toast-banner {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: #0b1324;
+      color: var(--text-primary);
+      border: 1px solid var(--success);
+      padding: 11px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.2s ease;
+      z-index: 120;
+      pointer-events: none;
+    }
+
+    .toast-banner.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header-card">
+      <div class="brand-block">
+        <div class="brand-mark">BAM</div>
+        <div>
+          <h1 class="brand-title">Módulo BAM · Gestor Operativo</h1>
+          <p class="brand-subtitle" id="csvStatusSubtitle">Buscando BAM - RELACION.csv en la raíz...</p>
+          <div class="status-pill warn" id="csvBadge">
+            <span class="status-dot"></span>
+            <span id="csvBadgeText">Catálogo base listo · Sin CSV externo cargado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar-actions">
+        <a class="btn btn-ghost btn-xs" href="./index.html">← Inicio</a>
+        <label class="btn btn-ghost btn-xs" style="margin:0;">
+          Cargar BAM - RELACION.csv
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;" onchange="handleCsvUpload(event)" />
+        </label>
+        <button class="btn btn-ghost btn-xs" onclick="downloadSampleCsv()">Descargar plantilla CSV</button>
+      </div>
+    </header>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Sitios disponibles</div>
+          <div class="kpi-value" id="kpiSites">0</div>
+        </div>
+        <span class="kpi-tag">ES · GC</span>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Parejas ES + GC</div>
+          <div class="kpi-value" id="kpiPairs">0</div>
+        </div>
+        <span class="kpi-tag">CSV / Base</span>
+      </div>
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">BAM activas</div>
+          <div class="kpi-value" id="kpiActivas">0</div>
+        </div>
+        <span class="kpi-tag" style="background: var(--success-soft); color: var(--success-text);">Seguimiento</span>
+      </div>
+    </section>
+
+    <main class="workspace-grid">
+      <div>
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="step-badge">1</span>
+              <h2 class="panel-title">Sitio, Tipo de Aviso y Pareja ES + GC</h2>
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="clearSelection()">Limpiar</button>
+          </div>
+
+          <div class="field">
+            <label for="siteSearch">Buscar estación o tienda</label>
+            <input
+              type="text"
+              id="siteSearch"
+              placeholder="Ej. ES15009, GC1, CHIT, ANILLO..."
+              autocomplete="off"
+              oninput="renderAutocomplete()"
+              onkeydown="onAutocompleteKey(event)"
+              onfocus="renderAutocomplete()"
+            />
+            <div class="autocomplete-menu" id="autocompleteMenu"></div>
+            <div class="field-note">Al elegir un sitio vinculado en <code>BAM - RELACION.csv</code>, se marca automáticamente la opción de un solo internet.</div>
+          </div>
+
+          <div class="field">
+            <label for="avisoType">Tipo de aviso</label>
+            <select id="avisoType" onchange="renderPreview()">
+              <option value="COLOCACION">AVISO DE COLOCACIÓN (INSTALACIÓN DE BAM)</option>
+              <option value="RETIRO">AVISO DE RETIRO (RESTAURACIÓN DE SERVICIO)</option>
+            </select>
+          </div>
+
+          <label class="toggle-card" for="sharedToggle">
+            <input type="checkbox" id="sharedToggle" onchange="renderPreview()" />
+            <div>
+              <div style="font-weight:700; font-size:0.9rem;">Estación y Tienda con un solo internet (ES + GC)</div>
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
+                Incluye ambos códigos en el asunto y cuerpo cuando comparten enlace.
+              </div>
+            </div>
+          </label>
+
+          <div class="relation-banner muted-state" id="relationCard">
+            <div style="font-weight:700; font-size:0.88rem;" id="relationTitle">Sin pareja detectada</div>
+            <div id="relationDesc" style="color:var(--text-muted); font-size:0.81rem; margin-top:3px;">
+              Busca un sitio o carga tu archivo BAM - RELACION.csv.
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:0;">
+            <label for="toInput">Destinatarios (opcional, separados por coma)</label>
+            <input type="email" id="toInput" placeholder="monitoreo@gruposynergo.com, soporte@gruposynergo.com" />
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="step-badge">2</span>
+              <h2 class="panel-title">Vista Previa del Correo</h2>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Asunto</label>
+            <div class="preview-box preview-subject" id="subjectOut">Selecciona un sitio para generar el asunto...</div>
+            <div class="notice-banner" id="retireWarning">
+              <strong>Aviso de Retiro:</strong> Verifica que el asunto indique <strong>RESTAURACIÓN DE SERVICIO - RETIRO DE BAM</strong>.
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Cuerpo</label>
+            <div class="preview-box preview-body" id="bodyOut">El cuerpo del correo se generará automáticamente...</div>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn btn-ghost" onclick="copyText('subjectOut', 'Asunto copiado')">Copiar Asunto</button>
+            <button class="btn btn-ghost" onclick="copyText('bodyOut', 'Cuerpo copiado')">Copiar Cuerpo</button>
+            <button class="btn btn-primary" onclick="openGmail()">Abrir en Gmail</button>
+            <button class="btn btn-success" onclick="registerActive()">Registrar BAM Activa</button>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="step-badge">3</span>
+              <h2 class="panel-title">BAM Activas (<span id="activeCountLabel">0</span>)</h2>
+            </div>
+          </div>
+          <div id="activeList"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-banner" id="toast"></div>
+
+  <script>
+    const FALLBACK_RELATIONS = [
+      { es: 'ES15009', gc: 'GC1', name: 'CHIT' },
+      { es: 'ES15700', gc: 'GC113', name: 'ANILLO REAL' }
+    ];
+
+    const ACTIVE_STORAGE_KEY = 'bam_modulo_herramientas_activas_v1';
+    let relations = [...FALLBACK_RELATIONS];
+    let sites = buildSitesFromRelations(relations);
+    let activeItems = loadActiveItems();
+    let selectedSite = null;
+    let matches = [];
+    let highlightIdx = -1;
+
+    function norm(s) {
+      return String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .trim();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('visible');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => t.classList.remove('visible'), 2400);
+    }
+
+    function buildSitesFromRelations(relList) {
+      const map = new Map();
+      relList.forEach((r) => {
+        const sharedName = r.name || `${r.es} / ${r.gc}`;
+        if (r.es) {
+          map.set(norm(r.es), { code: r.es.trim().toUpperCase(), name: sharedName, tipo: 'ES', rel: r });
+        }
+        if (r.gc) {
+          map.set(norm(r.gc), { code: r.gc.trim().toUpperCase(), name: sharedName, tipo: 'GC', rel: r });
+        }
+      });
+      return Array.from(map.values());
+    }
+
+    function parseCsvText(csvText) {
+      const lines = csvText.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      if (!lines.length) return [];
+      const sep = lines[0].includes(';') ? ';' : ',';
+      const rows = lines.map((line) => line.split(sep).map((c) => c.replace(/^"|"$/g, '').trim()));
+
+      const header = rows[0].map((h) => norm(h));
+      const hasHeader = header.some((h) => h.includes('ES') || h.includes('GC') || h.includes('NOMBRE') || h.includes('SITIO'));
+      const dataRows = hasHeader ? rows.slice(1) : rows;
+
+      const parsed = [];
+      for (const cols of dataRows) {
+        if (!cols.length) continue;
+        const c0 = (cols[0] || '').toUpperCase();
+        const c1 = (cols[1] || '').toUpperCase();
+        const c2 = (cols[2] || '').toUpperCase();
+        const es = c0.startsWith('ES') ? c0 : (c1.startsWith('ES') ? c1 : '');
+        const gc = c1.startsWith('GC') ? c1 : (c0.startsWith('GC') ? c0 : '');
+        const name = c2 || (!c0.startsWith('ES') && !c0.startsWith('GC') ? c0 : '') || `${es || ''} ${gc || ''}`.trim();
+        if (es || gc) {
+          parsed.push({ es, gc, name });
+        }
+      }
+      return parsed;
+    }
+
+    function applyRelations(newRelations, sourceLabel, loadedFromFile) {
+      if (newRelations.length) {
+        relations = newRelations;
+        sites = buildSitesFromRelations(relations);
+      }
+      document.getElementById('kpiSites').textContent = sites.length;
+      document.getElementById('kpiPairs').textContent = relations.length;
+      document.getElementById('csvStatusSubtitle').textContent = sourceLabel;
+
+      const badge = document.getElementById('csvBadge');
+      const badgeText = document.getElementById('csvBadgeText');
+      if (loadedFromFile) {
+        badge.classList.remove('warn');
+        badgeText.textContent = `BAM - RELACION.csv cargado (${relations.length} relaciones)`;
+      } else {
+        badge.classList.add('warn');
+        badgeText.textContent = 'Usando relaciones base · Carga BAM - RELACION.csv para actualizar';
+      }
+    }
+
+    async function tryAutoLoadCsv() {
+      try {
+        const res = await fetch('./BAM%20-%20RELACION.csv', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Not found');
+        const txt = await res.text();
+        const parsed = parseCsvText(txt);
+        if (parsed.length) {
+          applyRelations(parsed, 'Cargado automáticamente desde ./BAM - RELACION.csv', true);
+          return;
+        }
+      } catch (_) {}
+      applyRelations(FALLBACK_RELATIONS, 'Si subes BAM - RELACION.csv a la raíz, se leerá automáticamente', false);
+    }
+
+    function handleCsvUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const parsed = parseCsvText(String(reader.result || ''));
+        if (!parsed.length) {
+          showToast('No se detectaron columnas ES/GC en el CSV');
+          return;
+        }
+        applyRelations(parsed, `Archivo cargado: ${file.name}`, true);
+        showToast(`Cargadas ${parsed.length} relaciones desde ${file.name}`);
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadSampleCsv() {
+      const sample = 'ES,GC,NOMBRE\nES15009,GC1,CHIT\nES15700,GC113,ANILLO REAL\n';
+      const blob = new Blob([sample], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'BAM - RELACION.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderAutocomplete() {
+      const q = norm(document.getElementById('siteSearch').value);
+      const menu = document.getElementById('autocompleteMenu');
+      highlightIdx = -1;
+
+      matches = !q
+        ? sites.slice(0, 20)
+        : sites.filter((s) => norm(`${s.code} ${s.name} ${s.tipo}`).includes(q)).slice(0, 25);
+
+      if (!matches.length) {
+        menu.innerHTML = `<div class="autocomplete-option" style="color:var(--text-muted); cursor:default;">Sin resultados</div>`;
+        menu.style.display = 'block';
+        return;
+      }
+
+      menu.innerHTML = matches.map((s, i) => `
+        <div class="autocomplete-option" data-i="${i}" onclick="pickSite(${i})">
+          <div>
+            <span class="code-mono">${s.code}</span>
+            <span style="margin-left:8px; font-weight:600;">${s.name}</span>
+          </div>
+          <span class="chip ${s.tipo === 'ES' ? 'chip-es' : 'chip-gc'}">${s.tipo}</span>
+        </div>
+      `).join('');
+      menu.style.display = 'block';
+    }
+
+    function onAutocompleteKey(e) {
+      const menu = document.getElementById('autocompleteMenu');
+      const opts = menu.querySelectorAll('.autocomplete-option[data-i]');
+      if (!opts.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlightIdx = (highlightIdx + 1) % opts.length;
+        opts.forEach((el, idx) => el.classList.toggle('active', idx === highlightIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlightIdx = (highlightIdx - 1 + opts.length) % opts.length;
+        opts.forEach((el, idx) => el.classList.toggle('active', idx === highlightIdx));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        pickSite(highlightIdx >= 0 ? highlightIdx : 0);
+      } else if (e.key === 'Escape') {
+        menu.style.display = 'none';
+      }
+    }
+
+    function pickSite(i) {
+      const site = matches[i];
+      if (!site) return;
+      selectedSite = site;
+      document.getElementById('siteSearch').value = `${site.code} - ${site.name}`;
+      document.getElementById('autocompleteMenu').style.display = 'none';
+
+      const toggle = document.getElementById('sharedToggle');
+      const card = document.getElementById('relationCard');
+      const title = document.getElementById('relationTitle');
+      const desc = document.getElementById('relationDesc');
+
+      if (site.rel && site.rel.es && site.rel.gc) {
+        toggle.checked = true;
+        card.classList.remove('muted-state');
+        title.textContent = `Relación vinculada: ${site.rel.es} + ${site.rel.gc}`;
+        desc.textContent = `Sitio: ${site.rel.name || site.name}. Marcado automáticamente como un solo internet.`;
+      } else {
+        toggle.checked = false;
+        card.classList.add('muted-state');
+        title.textContent = 'Sin pareja ES + GC vinculada';
+        desc.textContent = 'Puedes activar la casilla manualmente si comparten enlace de internet.';
+      }
+      renderPreview();
+    }
+
+    function clearSelection() {
+      selectedSite = null;
+      document.getElementById('siteSearch').value = '';
+      document.getElementById('sharedToggle').checked = false;
+      document.getElementById('relationCard').classList.add('muted-state');
+      document.getElementById('relationTitle').textContent = 'Sin pareja detectada';
+      document.getElementById('relationDesc').textContent = 'Busca un sitio o carga tu archivo BAM - RELACION.csv.';
+      document.getElementById('subjectOut').textContent = 'Selecciona un sitio para generar el asunto...';
+      document.getElementById('bodyOut').textContent = 'El cuerpo del correo se generará automáticamente...';
+      document.getElementById('retireWarning').style.display = 'none';
+    }
+
+    function composeMail() {
+      if (!selectedSite) return null;
+      const mode = document.getElementById('avisoType').value;
+      const shared = document.getElementById('sharedToggle').checked;
+      const rel = selectedSite.rel;
+
+      let siteLabel = `${selectedSite.code} ${selectedSite.name}`;
+      if (shared && rel && rel.es && rel.gc) {
+        siteLabel = `${rel.es} / ${rel.gc} ${rel.name || selectedSite.name}`;
+      } else if (shared) {
+        siteLabel = `${selectedSite.code} ${selectedSite.name} (ES + GC)`;
+      }
+
+      if (mode === 'COLOCACION') {
+        return {
+          mode,
+          shared,
+          siteLabel,
+          subject: `COLOCACIÓN DE BAM - ${siteLabel}`,
+          body: `Buen día,\n\nSe informa la colocación de equipo BAM en ${siteLabel} por falla o intermitencia en el servicio principal.${shared ? '\nNota: Estación y tienda operan con un solo internet.' : ''}\n\nQuedamos pendientes.`
+        };
+      }
+
+      return {
+        mode,
+        shared,
+        siteLabel,
+        subject: `RESTAURACIÓN DE SERVICIO - RETIRO DE BAM - ${siteLabel}`,
+        body: `Buen día,\n\nSe informa la restauración del servicio principal y el retiro de equipo BAM en ${siteLabel}.${shared ? '\nNota: Enlace compartido ES + GC restablecido.' : ''}\n\nQuedamos pendientes.`
+      };
+    }
+
+    function renderPreview() {
+      const mail = composeMail();
+      if (!mail) return;
+      document.getElementById('subjectOut').textContent = mail.subject;
+      document.getElementById('bodyOut').textContent = mail.body;
+      document.getElementById('retireWarning').style.display = mail.mode === 'RETIRO' ? 'block' : 'none';
+    }
+
+    function copyText(id, label) {
+      const txt = document.getElementById(id).textContent.trim();
+      if (!txt || txt.startsWith('Selecciona') || txt.startsWith('El cuerpo')) {
+        showToast('Selecciona un sitio primero');
+        return;
+      }
+      navigator.clipboard?.writeText(txt).catch(() => {});
+      showToast(label);
+    }
+
+    function openGmail() {
+      const mail = composeMail();
+      if (!mail) {
+        showToast('Selecciona un sitio primero');
+        return;
+      }
+      const to = encodeURIComponent(document.getElementById('toInput').value.trim());
+      const su = encodeURIComponent(mail.subject);
+      const body = encodeURIComponent(mail.body);
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${su}&body=${body}`, '_blank', 'noopener,noreferrer');
+    }
+
+    function loadActiveItems() {
+      try {
+        return JSON.parse(localStorage.getItem(ACTIVE_STORAGE_KEY) || '[]');
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveActiveItems() {
+      localStorage.setItem(ACTIVE_STORAGE_KEY, JSON.stringify(activeItems));
+      renderActiveList();
+    }
+
+    function registerActive() {
+      const mail = composeMail();
+      if (!mail) {
+        showToast('Selecciona un sitio antes de registrar');
+        return;
+      }
+      activeItems.unshift({
+        id: Date.now(),
+        code: selectedSite.code,
+        name: selectedSite.name,
+        rel: selectedSite.rel || null,
+        siteLabel: mail.siteLabel,
+        shared: mail.shared,
+        date: new Date().toLocaleString('es-MX')
+      });
+      saveActiveItems();
+      showToast(`Registrado: ${mail.siteLabel}`);
+    }
+
+    function prepareRetire(id) {
+      const item = activeItems.find((x) => x.id === id);
+      if (!item) return;
+      selectedSite = {
+        code: item.code,
+        name: item.name,
+        tipo: item.code.startsWith('ES') ? 'ES' : 'GC',
+        rel: item.rel
+      };
+      document.getElementById('siteSearch').value = `${item.code} - ${item.name}`;
+      document.getElementById('avisoType').value = 'RETIRO';
+      document.getElementById('sharedToggle').checked = Boolean(item.shared);
+      renderPreview();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('Aviso de retiro listo');
+    }
+
+    function removeActive(id) {
+      activeItems = activeItems.filter((x) => x.id !== id);
+      saveActiveItems();
+      showToast('Registro eliminado');
+    }
+
+    function renderActiveList() {
+      document.getElementById('kpiActivas').textContent = activeItems.length;
+      document.getElementById('activeCountLabel').textContent = activeItems.length;
+      const box = document.getElementById('activeList');
+      if (!activeItems.length) {
+        box.innerHTML = `<div class="empty-state">Sin BAM activas registradas en este momento.</div>`;
+        return;
+      }
+      box.innerHTML = activeItems.map((it) => `
+        <div class="active-card">
+          <div class="active-card-head">
+            <div>
+              <div class="active-card-title">${it.siteLabel}</div>
+              <div class="active-card-sub">${it.date}${it.shared ? ' · Un solo internet ES+GC' : ''}</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-warn btn-xs" onclick="prepareRetire(${it.id})">Retirar</button>
+              <button class="btn btn-danger btn-xs" onclick="removeActive(${it.id})">Quitar</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.field')) {
+        document.getElementById('autocompleteMenu').style.display = 'none';
+      }
+    });
+
+    renderActiveList();
+    tryAutoLoadCsv();
+  </script>
+</body>
+</html>
